@@ -32,14 +32,34 @@ const SubHeading = styled.h2`
   font-weight: 400;
 `;
 
+const AddNewButton = styled.a`
+  padding: 0.25rem 1rem;
+  border-radius: 2rem;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  cursor: pointer;
+  text-decoration: none;
+  span {
+    font-weight: 700;
+    font-size: 2rem;
+  }
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
 const LeftPane = () => {
   return (
     <StyledLeftPane>
       <ContentContainer>
         <Logo src="/logo.png" alt="Logo" />
-        <MainHeading>Code Deck</MainHeading>
+        <MainHeading>
+          <span>Code</span>Deck
+        </MainHeading>
         <SubHeading>Code. Compile. Debug.</SubHeading>
-        <a href="https://www.google.com">+ Create New Background</a>
+        <AddNewButton><span>+</span>Create New Playground</AddNewButton>
       </ContentContainer>
     </StyledLeftPane>
   );
