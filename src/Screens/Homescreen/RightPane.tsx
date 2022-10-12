@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { IoTrashOutline } from "react-icons/io5";
 import { BiEditAlt } from "react-icons/bi";
+import { ModalContext } from "../../context/ModalContext";
 
-// interface part of typescript
 interface HeaderProps {
   readonly variant: string;
 }
@@ -15,21 +15,20 @@ interface HeadingProps {
 const StyledRightPane = styled.div`
   padding: 2rem;
   background: #fafafa;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 60%;
 `;
 
 const Header = styled.div<HeaderProps>`
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   position: relative;
-  margin-bottom: ${(props) => (props.variant === "main" ? "2.75rem" : "1.4rem")};
+  margin-bottom: ${(props) =>
+    props.variant === "main" ? "2.75rem" : "1.4rem"};
 
-  // & means applied and connected to the component
-  // pseudo classes used for horizontal line
-  // mandatory to have content attribute or else line does not render in dom
-  // can check rendered component in inspect elements as ::after
-  &::before {
-  }
   &::after {
     position: absolute;
     content: "";
@@ -54,7 +53,7 @@ const AddButton = styled.button`
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  background: transperant;
+  background: transparent;
   outline: 0;
   border: 0;
   font-size: 1.1rem;
@@ -67,13 +66,13 @@ const AddButton = styled.button`
 
   transition: all 0.25s ease;
   &:hover {
-    opacity: 0.75rem;
+    opacity: 0.75;
     scale: 1.1;
   }
 `;
 
 const Folder = styled.div`
-  margin-top: ;
+  margin: 0.5rem 0 2rem 0;
 `;
 
 const CardContainer = styled.div`
@@ -88,7 +87,8 @@ const PlaygroundCard = styled.div`
   align-items: center;
   padding: 0.6rem;
   gap: 1rem;
-  box-shadow: 0px 0px 36px -25px rgba(0, 0, 0, 0.6);
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 `;
 
 const SmallLogo = styled.img`
@@ -97,10 +97,11 @@ const SmallLogo = styled.img`
 
 const CardContent = styled.div`
   flex-grow: 1;
+
   h5 {
     font-weight: 400;
     font-size: 1.2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
   }
 `;
 
@@ -108,9 +109,13 @@ const Icons = styled.div`
   display: flex;
   gap: 0.5rem;
   font-size: 1.25rem;
+  padding-right: 1rem;
 `;
 
-function RightPane() {
+const RightPane = () => {
+  const ModalFeatures = useContext(ModalContext);
+  const setIsOpen = ModalFeatures?.setIsOpen;
+
   return (
     <StyledRightPane>
       <Header variant="main">
@@ -121,6 +126,55 @@ function RightPane() {
           <span>+</span> New Folder
         </AddButton>
       </Header>
+
+      <Folder>
+        <Header variant="folder">
+          <Heading size="small">Data Structures</Heading>
+          <AddButton>
+            <span>+</span> New Playground
+          </AddButton>
+        </Header>
+
+        <CardContainer>
+          <PlaygroundCard>
+            <SmallLogo src="/logo-small.png" alt="" />
+            <CardContent>
+              <h5>Stack Implementation</h5>
+              <p>Language: C++</p>
+            </CardContent>
+            <Icons>
+              <IoTrashOutline />
+              <BiEditAlt
+                onClick={() => {
+                  if (setIsOpen) setIsOpen(true);
+                }}
+              />
+            </Icons>
+          </PlaygroundCard>
+          <PlaygroundCard>
+            <SmallLogo src="/logo-small.png" alt="" />
+            <CardContent>
+              <h5>Stack Implementation</h5>
+              <p>Language: C++</p>
+            </CardContent>
+            <Icons>
+              <IoTrashOutline />
+              <BiEditAlt />
+            </Icons>
+          </PlaygroundCard>
+          <PlaygroundCard>
+            <SmallLogo src="/logo-small.png" alt="" />
+            <CardContent>
+              <h5>Stack Implementation</h5>
+              <p>Language: C++</p>
+            </CardContent>
+            <Icons>
+              <IoTrashOutline />
+              <BiEditAlt />
+            </Icons>
+          </PlaygroundCard>
+        </CardContainer>
+      </Folder>
 
       <Folder>
         <Header variant="folder">
@@ -166,8 +220,54 @@ function RightPane() {
           </PlaygroundCard>
         </CardContainer>
       </Folder>
+
+      <Folder>
+        <Header variant="folder">
+          <Heading size="small">Data Structures</Heading>
+          <AddButton>
+            <span>+</span> New Playground
+          </AddButton>
+        </Header>
+
+        <CardContainer>
+          <PlaygroundCard>
+            <SmallLogo src="/logo-small.png" alt="" />
+            <CardContent>
+              <h5>Stack Implementation</h5>
+              <p>Language: C++</p>
+            </CardContent>
+            <Icons>
+              <IoTrashOutline />
+              <BiEditAlt />
+            </Icons>
+          </PlaygroundCard>
+          <PlaygroundCard>
+            <SmallLogo src="/logo-small.png" alt="" />
+            <CardContent>
+              <h5>Stack Implementation</h5>
+              <p>Language: C++</p>
+            </CardContent>
+            <Icons>
+              <IoTrashOutline />
+              <BiEditAlt />
+            </Icons>
+          </PlaygroundCard>
+          <PlaygroundCard>
+            <SmallLogo src="/logo-small.png" alt="" />
+            <CardContent>
+              <h5>Stack Implementation</h5>
+              <p>Language: C++</p>
+            </CardContent>
+            <Icons>
+              <IoTrashOutline />
+              <BiEditAlt />
+            </Icons>
+          </PlaygroundCard>
+        </CardContainer>
+      </Folder>
+
     </StyledRightPane>
   );
-}
+};
 
 export default RightPane;

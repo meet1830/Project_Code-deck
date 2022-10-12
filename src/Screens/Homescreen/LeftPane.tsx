@@ -2,6 +2,12 @@ import React from "react";
 import styled from "styled-components";
 
 const StyledLeftPane = styled.div`
+  position: fixed;
+  width: 40%;
+  top: 0px;
+  left: 0px;
+  height: 100vh;
+  
   background: #221f20;
   display: flex;
   align-items: center;
