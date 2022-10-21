@@ -113,13 +113,19 @@ const Icons = styled.div`
   padding-right: 1rem;
 `;
 
+const FolderButtons = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const RightPane = () => {
   const makeAvailableGlobally = useContext(ModalContext)!;
-  const {openModal} = makeAvailableGlobally;
+  const { openModal } = makeAvailableGlobally;
 
   // use global folder structure
   const PlaygroundFeatures = useContext(PlaygroundContext)!;
   const Folders = PlaygroundFeatures.folders;
+  const {deleteFolder, deleteCard} = PlaygroundFeatures;
 
   return (
     <StyledRightPane>
@@ -127,50 +133,99 @@ const RightPane = () => {
         <Heading size="large">
           My <span>Playground</span>
         </Heading>
-        <AddButton>
+        <AddButton
+          onClick={() => {
+            openModal({
+              value: true,
+              type: "4",
+              identifier: {
+                folderId: "",
+                cardId: "",
+              },
+            });
+          }}
+        >
           <span>+</span> New Folder
         </AddButton>
       </Header>
 
       {/* dynamically generating folders */}
-      {Object.entries(Folders).map(([folderId, folder]: [folderId: string, folder: any]) => (
-        <Folder>
-          <Header variant="folder">
-            <Heading size="small">{folder.title}</Heading>
-            <AddButton>
-              <span>+</span> New Playground
-            </AddButton>
-          </Header>
-
-          <CardContainer>
-            {/* dynamically generating items inside folders */}
-            {Object.entries(folder.items).map(([cardId, card]: [cardId: string, card: any]) => (
-              <PlaygroundCard>
-                <SmallLogo src="/logo-small.png" alt="" />
-                <CardContent>
-                  <h5>{card.title}</h5>
-                  <p>Language: {card.language}</p>
-                </CardContent>
+      {Object.entries(Folders).map(
+        ([folderId, folder]: [folderId: string, folder: any]) => (
+          <Folder>
+            <Header variant="folder">
+              <Heading size="small">{folder.title}</Heading>
+              <FolderButtons>
                 <Icons>
-                  <IoTrashOutline />
+                  <IoTrashOutline onClick={() => {
+                    // delete folder
+                    deleteFolder(folderId);
+                  }} />
                   <BiEditAlt
                     onClick={() => {
                       openModal({
                         value: true,
-                        type: "1",
+                        type: "2",
                         identifier: {
                           folderId: folderId,
-                          cardId: cardId,
+                          cardId: "",
                         },
                       });
                     }}
                   />
                 </Icons>
-              </PlaygroundCard>
-            ))}
-          </CardContainer>
-        </Folder>
-      ))}
+                <AddButton
+                  onClick={() => {
+                    openModal({
+                      value: true,
+                      type: "3",
+                      identifier: {
+                        folderId: folderId,
+                        cardId: "",
+                      },
+                    });
+                  }}
+                >
+                  <span>+</span> New Playground
+                </AddButton>
+              </FolderButtons>
+            </Header>
+
+            <CardContainer>
+              {/* dynamically generating items inside folders */}
+              {Object.entries(folder.items).map(
+                ([cardId, card]: [cardId: string, card: any]) => (
+                  <PlaygroundCard>
+                    <SmallLogo src="/logo-small.png" alt="" />
+                    <CardContent>
+                      <h5>{card.title}</h5>
+                      <p>Language: {card.language}</p>
+                    </CardContent>
+                    <Icons>
+                      <IoTrashOutline onClick={() => {
+                        // delete card
+                        deleteCard(folderId, cardId);
+                      }} />
+                      <BiEditAlt
+                        onClick={() => {
+                          openModal({
+                            value: true,
+                            type: "1",
+                            identifier: {
+                              folderId: folderId,
+                              cardId: cardId,
+                            },
+                          });
+                        }}
+                      />
+                    </Icons>
+                  </PlaygroundCard>
+                )
+              )}
+            </CardContainer>
+          </Folder>
+        )
+      )}
     </StyledRightPane>
   );
 };
