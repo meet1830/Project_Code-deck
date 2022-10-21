@@ -16,14 +16,14 @@ const HomeScreenContainer = styled.div`
 `;
 
 const HomeScreen = () => {
-  const ModalFeatures = useContext(ModalContext);
-  const isOpen = ModalFeatures?.isOpen;
+  const makeAvailableGlobally = useContext(ModalContext)!;
+  const isOpen = makeAvailableGlobally?.isOpen;
   
   return (
     <HomeScreenContainer>
       <LeftPane />
       <RightPane />
-      {isOpen === true ? <Modal /> : <></>}
+      {isOpen?.value === true ? <Modal /> : <></>}
     </HomeScreenContainer>
   );
 };
