@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { IoTrashOutline } from "react-icons/io5";
 import { BiEditAlt } from "react-icons/bi";
 import { ModalContext } from "../../context/ModalContext";
+import { PlaygroundContext } from "../../context/PlaygroundContext";
 
 interface HeaderProps {
   readonly variant: string;
@@ -114,45 +115,11 @@ const Icons = styled.div`
 
 const RightPane = () => {
   const makeAvailableGlobally = useContext(ModalContext)!;
-  const setIsOpen = makeAvailableGlobally?.setIsOpen;
+  const {openModal} = makeAvailableGlobally;
 
-  // object structure of dynamic cards
-  const Folders = {
-    ["1"]: {
-      title: "Folder Title 1",
-      items: {
-        ["item1"]: {
-          title: "Stack Implementation",
-          language: "Cpp",
-        },
-        ["item2"]: {
-          title: "Queue Implementation",
-          language: "Cpp",
-        },
-        ["item3"]: {
-          title: "Dequeue Implementation",
-          language: "Cpp",
-        },
-      },
-    },
-    ["2"]: {
-      title: "Folder Title 2",
-      items: {
-        ["item1"]: {
-          title: "Stack Implementation",
-          language: "Cpp",
-        },
-        ["item2"]: {
-          title: "Queue Implementation",
-          language: "Cpp",
-        },
-        ["item3"]: {
-          title: "Dequeue Implementation",
-          language: "Cpp",
-        },
-      },
-    },
-  };
+  // use global folder structure
+  const PlaygroundFeatures = useContext(PlaygroundContext)!;
+  const Folders = PlaygroundFeatures.folders;
 
   return (
     <StyledRightPane>
@@ -166,7 +133,7 @@ const RightPane = () => {
       </Header>
 
       {/* dynamically generating folders */}
-      {Object.entries(Folders).map(([folderId, folder]) => (
+      {Object.entries(Folders).map(([folderId, folder]: [folderId: string, folder: any]) => (
         <Folder>
           <Header variant="folder">
             <Heading size="small">{folder.title}</Heading>
@@ -177,7 +144,7 @@ const RightPane = () => {
 
           <CardContainer>
             {/* dynamically generating items inside folders */}
-            {Object.entries(folder.items).map(([cardId, card]) => (
+            {Object.entries(folder.items).map(([cardId, card]: [cardId: string, card: any]) => (
               <PlaygroundCard>
                 <SmallLogo src="/logo-small.png" alt="" />
                 <CardContent>
@@ -188,7 +155,7 @@ const RightPane = () => {
                   <IoTrashOutline />
                   <BiEditAlt
                     onClick={() => {
-                      setIsOpen({
+                      openModal({
                         value: true,
                         type: "1",
                         identifier: {

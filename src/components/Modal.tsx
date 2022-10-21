@@ -61,7 +61,7 @@ const Input = styled.div`
   }
 `;
 
-const EditCardModal = ({ setIsOpen, isOpen }: { setIsOpen: any, isOpen: any }) => {
+const EditCardModal = ({ closeModal, isOpen }: { closeModal: () => void, isOpen: any }) => {
   const PlaygroundFeatures = useContext(PlaygroundContext)!;
   const folders = PlaygroundFeatures.folders;
 
@@ -74,14 +74,7 @@ const EditCardModal = ({ setIsOpen, isOpen }: { setIsOpen: any, isOpen: any }) =
         <h2 className="Heading">Edit Cards Title</h2>
         <CloseButton
           onClick={() => {
-            setIsOpen({
-              value: false,
-              type: "",
-              identifier: {
-                folderId: "",
-                cardId: "",
-              },
-            });
+            closeModal();
           }}
         >
           <RiCloseFill />
@@ -97,13 +90,13 @@ const EditCardModal = ({ setIsOpen, isOpen }: { setIsOpen: any, isOpen: any }) =
 
 const Modal = () => {
   const ModalFeatures = useContext(ModalContext)!;
-  const setIsOpen = ModalFeatures.setIsOpen;
+  const {closeModal} = ModalFeatures;
   const isOpen = ModalFeatures.isOpen;
 
   return (
     <ModalContainer>
       <ModalContent>
-        {isOpen.type === "1" && <EditCardModal setIsOpen={setIsOpen} isOpen={isOpen} />}
+        {isOpen.type === "1" && <EditCardModal closeModal={closeModal} isOpen={isOpen} />}
       </ModalContent>
     </ModalContainer>
   );

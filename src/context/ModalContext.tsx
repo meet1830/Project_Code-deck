@@ -11,13 +11,14 @@ interface PopupFields {
 
 interface ModalContextType {
   isOpen: PopupFields;
-  setIsOpen: (isOpen: PopupFields) => void;
+  openModal: (value: PopupFields) => void;
+  closeModal: () => void;
 }
 
 export const ModalContext = createContext<ModalContextType | null>(null);
 
 export default function ModalProvider({ children }: { children: any }) {
-  const initialPopupFieldsL: PopupFields = {
+  const initialPopupFields: PopupFields = {
     value: false,
     type: "",
     identifier: {
@@ -25,11 +26,21 @@ export default function ModalProvider({ children }: { children: any }) {
       cardId: "",
     },
   };
-  const [isOpen, setIsOpen] = useState<PopupFields>({ ...initialPopupFieldsL });
+  const [isOpen, setIsOpen] = useState<PopupFields>({ ...initialPopupFields });
 
+  const openModal = (value: PopupFields) => {
+    setIsOpen(value);
+  };
+
+  const closeModal = () => {
+    setIsOpen({ ...initialPopupFields });
+  };
+
+  // increasing readability of code by making two functions for two features openmoal and closemodal
   const makeAvailableGlobally: ModalContextType = {
     isOpen: isOpen,
-    setIsOpen: setIsOpen,
+    openModal: openModal,
+    closeModal: closeModal,
   };
 
   return (

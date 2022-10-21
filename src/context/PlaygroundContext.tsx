@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { v4 as uuid } from "uuid";
 
 interface PlaygroundContextType {
   folders: any;
@@ -9,37 +10,51 @@ export const PlaygroundContext = createContext<PlaygroundContextType | null>(
   null
 );
 
+export interface FolderT {
+  title: string;
+  items: {
+    [key: string]: {
+      title: string;
+      language: string;
+    };
+  };
+}
+
+export interface FolderType {
+  [key: string]: FolderT;
+}
+
 export default function PlaygroundProvider({ children }: { children: any }) {
   const [folders, setFolders] = useState({
-    ["1"]: {
+    [uuid()]: {
       title: "Folder Title 1",
       items: {
-        ["item1"]: {
+        [uuid()]: {
           title: "Stack Implementation",
           language: "Cpp",
         },
-        ["item2"]: {
+        [uuid()]: {
           title: "Queue Implementation",
           language: "Cpp",
         },
-        ["item3"]: {
+        [uuid()]: {
           title: "Dequeue Implementation",
           language: "Cpp",
         },
       },
     },
-    ["2"]: {
+    [uuid()]: {
       title: "Folder Title 2",
       items: {
-        ["item1"]: {
+        [uuid()]: {
           title: "Stack Implementation",
           language: "Cpp",
         },
-        ["item2"]: {
+        [uuid()]: {
           title: "Queue Implementation",
           language: "Cpp",
         },
-        ["item3"]: {
+        [uuid()]: {
           title: "Dequeue Implementation",
           language: "Cpp",
         },
@@ -49,7 +64,7 @@ export default function PlaygroundProvider({ children }: { children: any }) {
 
   const makeAvailableGlobally: PlaygroundContextType = {
     folders: folders,
-    setFolders: setFolders
+    setFolders: setFolders,
   };
 
   return (
