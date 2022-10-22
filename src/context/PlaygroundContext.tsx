@@ -95,9 +95,14 @@ const initialItems = {
 export default function PlaygroundProvider({ children }: { children: any }) {
   const [folders, setFolders] = useState(() => {
     // check if local data available or not
-    const localData = JSON.parse(localStorage.getItem("playground-data") as string);
+    let localData = JSON.parse(localStorage.getItem("playground-data") as string);
+
+    // if there are no folders in homepage then show initial items
+    // for that checking if localdata is an empty object
+    localData = Object.keys(localData).length === 0 ? null : localData;
+
     // if dont have any local data then return initial items
-    return localData || initialItems;
+    return localData || initialItems; // null || anything = anything
   });
 
   // save all data to local storage

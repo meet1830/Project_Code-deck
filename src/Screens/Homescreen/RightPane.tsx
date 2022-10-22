@@ -4,6 +4,7 @@ import { IoTrashOutline } from "react-icons/io5";
 import { BiEditAlt } from "react-icons/bi";
 import { ModalContext } from "../../context/ModalContext";
 import { PlaygroundContext } from "../../context/PlaygroundContext";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   readonly variant: string;
@@ -90,6 +91,13 @@ const PlaygroundCard = styled.div`
   gap: 1rem;
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+
+  &:hover {
+    opacity: 0.75;
+
+  }
 `;
 
 const SmallLogo = styled.img`
@@ -125,7 +133,10 @@ const RightPane = () => {
   // use global folder structure
   const PlaygroundFeatures = useContext(PlaygroundContext)!;
   const Folders = PlaygroundFeatures.folders;
-  const {deleteFolder, deleteCard} = PlaygroundFeatures;
+  const { deleteFolder, deleteCard } = PlaygroundFeatures;
+
+  // initialize navigate
+  const navigate = useNavigate();
 
   return (
     <StyledRightPane>
@@ -157,10 +168,12 @@ const RightPane = () => {
               <Heading size="small">{folder.title}</Heading>
               <FolderButtons>
                 <Icons>
-                  <IoTrashOutline onClick={() => {
-                    // delete folder
-                    deleteFolder(folderId);
-                  }} />
+                  <IoTrashOutline
+                    onClick={() => {
+                      // delete folder
+                      deleteFolder(folderId);
+                    }}
+                  />
                   <BiEditAlt
                     onClick={() => {
                       openModal({
@@ -195,17 +208,28 @@ const RightPane = () => {
               {/* dynamically generating items inside folders */}
               {Object.entries(folder.items).map(
                 ([cardId, card]: [cardId: string, card: any]) => (
-                  <PlaygroundCard>
+                  <PlaygroundCard
+                    onClick={() => {
+                      // navigate to playground page
+                      navigate(`/code/${folderId}/${cardId}`);
+                    }}
+                  >
                     <SmallLogo src="/logo-small.png" alt="" />
                     <CardContent>
                       <h5>{card.title}</h5>
                       <p>Language: {card.language}</p>
                     </CardContent>
-                    <Icons>
-                      <IoTrashOutline onClick={() => {
-                        // delete card
-                        deleteCard(folderId, cardId);
-                      }} />
+                    <Icons onClick={(e) => {
+                      // to stop click propogation from child to parent
+                      // if click on edit then also redirects to new playground page which we dont want
+                      e.stopPropagation();
+                    }}>
+                      <IoTrashOutline
+                        onClick={() => {
+                          // delete card
+                          deleteCard(folderId, cardId);
+                        }}
+                      />
                       <BiEditAlt
                         onClick={() => {
                           openModal({
