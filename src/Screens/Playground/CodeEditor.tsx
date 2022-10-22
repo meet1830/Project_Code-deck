@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import styled from "styled-components";
+
 import CodeMirror from "@uiw/react-codemirror";
 
 // importing all themes
@@ -19,6 +21,16 @@ import { python } from "@codemirror/lang-python";
 import { indentUnit } from "@codemirror/language"; /* no of spaces for indentation */
 import { EditorState } from "@codemirror/state"; /* no of spaces after pressing tab */
 
+const CodeEditorContainer = styled.div`
+  height: calc(100vh - 12.5rem); 
+  // 4 rem each for lower and upper toolbar 4.5 for navbar
+
+  // styling just next div after this
+  & > div {
+    height: 100%;
+  }
+`;
+
 const CodeEditor = () => {
   // code editor configuration
   // the theme that we want our code editor to have
@@ -28,9 +40,10 @@ const CodeEditor = () => {
 
   return (
     // according to docs codemirror has theme attribute, apply and changes will be visible, same for language
-    <div>
+    <CodeEditorContainer>
       <CodeMirror
         theme={theme}
+        height="100%"
         extensions={[
           lang,
           indentUnit.of("      "),
@@ -63,7 +76,7 @@ const CodeEditor = () => {
           lintKeymap: true,
         }}
       />
-    </div>
+    </CodeEditorContainer>
   );
 };
 
