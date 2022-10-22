@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const NavbarContainer = styled.div`
@@ -9,11 +10,13 @@ const NavbarContainer = styled.div`
   justify-content: center;
 `;
 
-const NavbarContent = styled.div`
+const NavbarContent = styled.button`
   display: flex;
   align-items: center;
   gap: 0.9rem;
-
+  background: transparent;
+  border: 0;
+  outline: 0;
 `;
 
 const Logo = styled.img`
@@ -31,9 +34,11 @@ const MainHeading = styled.div`
 `;
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   return (
     <NavbarContainer>
-      <NavbarContent>
+      <NavbarContent onClick={() => navigate("/")}>
         <Logo src="/logo.png" alt="Logo" />
         <MainHeading>
           <span>Code</span> Deck

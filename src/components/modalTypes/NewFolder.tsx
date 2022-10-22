@@ -1,19 +1,39 @@
-import React from 'react'
-import { RiCloseFill } from 'react-icons/ri';
-import { CloseButton, ModalTypes } from '../Modal'
+import React, { useContext, useState } from "react";
+import { RiCloseFill } from "react-icons/ri";
+import { PlaygroundContext } from "../../context/PlaygroundContext";
 
-const NewFolder = ({closeModal, identifier} : ModalTypes) => {
+import { CloseButton, Header, Input, ModalProps } from "../Modal";
+
+const NewFolder = ({ closeModal, identifier }: ModalProps) => {
+  const { folders, createNewFolder } = useContext(PlaygroundContext)!;
+
+  const [title, setTitle] = useState("");
+
   return (
-    <div>NewFolder
-        <CloseButton
+    <div>
+      <Header>
+        <h2>Create New Folder</h2>
+        <CloseButton onClick={() => closeModal()}>
+          <RiCloseFill />
+        </CloseButton>
+      </Header>
+      <Input>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <button
           onClick={() => {
+            createNewFolder(title);
             closeModal();
           }}
         >
-          <RiCloseFill />
-        </CloseButton>
+          Create Folder
+        </button>
+      </Input>
     </div>
-  )
-}
+  );
+};
 
-export default NewFolder
+export default NewFolder;

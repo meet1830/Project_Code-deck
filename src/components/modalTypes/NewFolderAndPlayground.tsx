@@ -30,27 +30,21 @@ const InputWithSelect = styled.div`
   }
 `;
 
-const NewCard = ({ closeModal, identifier }: ModalProps) => {
-  // have to get folderId in which the card is to be created
-  const { folderId } = identifier;
+const NewFolderAndPlayground = ({ closeModal, identifier }: ModalProps) => {
+  const { createNewFolderAndPlayground } = useContext(PlaygroundContext)!;
 
-  const { folders, createNewPlayground } = useContext(PlaygroundContext)!;
-
-  // create object for languages selection in select component
   const languageOptions = [
     { value: "c++", label: "C++" },
     { value: "java", label: "Java" },
     { value: "python", label: "Python" },
     { value: "javascript", label: "Javascript" },
   ];
-  const [title, setTitle] = useState("");
+  const [folderTitle, setFolderTitle] = useState("");
+  const [cardTitle, setCardTitle] = useState("");
 
-  // here want to give user option to select and not type the language
-  // default value selected will be first object of languageOptions - cpp and pass language as value in select
   const [language, setLanguage] = useState(languageOptions[0]);
 
   const handleLanguageChange = (selectedOption: any) => {
-    // change in selected language will automatically get stored in langauge state
     setLanguage(selectedOption);
   };
 
@@ -63,28 +57,38 @@ const NewCard = ({ closeModal, identifier }: ModalProps) => {
         </CloseButton>
       </Header>
       <InputWithSelect>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <Select
-            options={languageOptions}
-            value={language}
-            onChange={handleLanguageChange}
-          />
-          <button
-            onClick={() => {
-              // language is an object with label and value as keys hence want to pass only values
-              createNewPlayground(folderId, title, language.value);
-              closeModal();
-            }}
-          >
-            Create New Playground
-          </button>
+        <label>Enter Folder Name</label>
+        <input
+          type="text"
+          value={folderTitle}
+          onChange={(e) => setFolderTitle(e.target.value)}
+        />
+        <label>Enter Card Name</label>
+        <input
+          type="text"
+          value={cardTitle}
+          onChange={(e) => setCardTitle(e.target.value)}
+        />
+        <Select
+          options={languageOptions}
+          value={language}
+          onChange={handleLanguageChange}
+        />
+        <button
+          onClick={() => {
+            createNewFolderAndPlayground(
+              folderTitle,
+              cardTitle,
+              language.value
+            );
+            closeModal();
+          }}
+        >
+          Create New Playground
+        </button>
       </InputWithSelect>
     </div>
   );
 };
 
-export default NewCard;
+export default NewFolderAndPlayground;
