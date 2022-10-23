@@ -45,7 +45,37 @@ export interface FolderType {
   [key: string]: FolderT;
 }
 
+const languageMap: {
+  [key: string]: {
+    defaultCode: string;
+  }
+} = {
+  "c++": {
+    defaultCode:
+      "#include<iostream>" +
+      "\n" +
+      "int main() {\n" +
+      "      // your code here\n" +
+      "      return 0; \n" +
+      "}",
+  },
+  "python": {
+    defaultCode: 
+      "# your code here",
+  },
+  "javascript": {
+    defaultCode: 
+      "// your code here",
+  },
+  "java": {
+    defaultCode: `import java.util.*;\nimport java.lang.*;\nimport java.io.*;\n\npublic class Main\n{\n\tpublic static void main (String[] args) throws java.lang.Exception\n\t{\n\t\t//your code here\n\t}\n}`,
+  }
+};
+
 // saving to local storage
+// reducing sample folder to just one folder and one card
+// also want to pass the code that was written in the editor for that card so that we user again goes to the cards editor the code is saved there
+// for that have to create a lang map
 const initialItems = {
   [uuid()]: {
     title: "Folder Title 1",
@@ -53,31 +83,7 @@ const initialItems = {
       [uuid()]: {
         title: "Stack Implementation",
         language: "Cpp",
-      },
-      [uuid()]: {
-        title: "Queue Implementation",
-        language: "Cpp",
-      },
-      [uuid()]: {
-        title: "Dequeue Implementation",
-        language: "Cpp",
-      },
-    },
-  },
-  [uuid()]: {
-    title: "Folder Title 2",
-    items: {
-      [uuid()]: {
-        title: "Stack Implementation",
-        language: "Cpp",
-      },
-      [uuid()]: {
-        title: "Queue Implementation",
-        language: "Cpp",
-      },
-      [uuid()]: {
-        title: "Dequeue Implementation",
-        language: "Cpp",
+        code: languageMap["c++"].defaultCode,
       },
     },
   },
@@ -95,11 +101,19 @@ const initialItems = {
 export default function PlaygroundProvider({ children }: { children: any }) {
   const [folders, setFolders] = useState(() => {
     // check if local data available or not
-    let localData = JSON.parse(localStorage.getItem("playground-data") as string);
+    let localData = JSON.parse(
+      localStorage.getItem("playground-data") as string
+    );
 
     // if there are no folders in homepage then show initial items
     // for that checking if localdata is an empty object
-    localData = Object.keys(localData).length === 0 ? null : localData;
+    // before that have to check if localdata is null or it is undefined or else object.keys will give an error
+    localData =
+      localData === undefined ||
+      localData === null ||
+      Object.keys(localData).length === 0
+        ? null
+        : localData;
 
     // if dont have any local data then return initial items
     return localData || initialItems; // null || anything = anything
@@ -140,9 +154,11 @@ export default function PlaygroundProvider({ children }: { children: any }) {
     setFolders((oldState: any) => {
       const newState = { ...oldState };
       // create new playground
+      // now also entering the default code with new playground
       newState[folderId].items[uuid()] = {
         title: cardTitle,
         language: cardLanguage,
+        code: languageMap[cardLanguage].defaultCode,
       };
       return newState;
     });
@@ -156,12 +172,14 @@ export default function PlaygroundProvider({ children }: { children: any }) {
     setFolders((oldState: any) => {
       const newState = { ...oldState };
       // create a new folder and playground
+      // now also displaying the default code for the language
       newState[uuid()] = {
         title: folderTitle,
         items: {
           [uuid()]: {
             title: cardTitle,
             language: cardLanguage,
+            code: languageMap[cardLanguage].defaultCode,
           },
         },
       };

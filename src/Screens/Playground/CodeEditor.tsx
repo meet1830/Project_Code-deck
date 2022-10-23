@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import CodeMirror from "@uiw/react-codemirror";
@@ -22,7 +22,7 @@ import { indentUnit } from "@codemirror/language"; /* no of spaces for indentati
 import { EditorState } from "@codemirror/state"; /* no of spaces after pressing tab */
 
 const CodeEditorContainer = styled.div`
-  height: calc(100vh - 12.5rem); 
+  height: calc(100vh - 12.5rem);
   // 4 rem each for lower and upper toolbar 4.5 for navbar
 
   // styling just next div after this
@@ -31,18 +31,56 @@ const CodeEditorContainer = styled.div`
   }
 `;
 
-const CodeEditor = () => {
+// accepting code value
+interface CodeEditorProps {
+  currentLanguage: string;
+  currentTheme: string;
+  currentCode: string;
+}
+
+// codeeditor is a functional component(not a class component). and to pass the interface as type we have to write it. accept the props as arguments
+const CodeEditor: React.FC<CodeEditorProps> = ({
+  currentLanguage,
+  currentTheme,
+  currentCode,
+}) => {
   // code editor configuration
   // the theme that we want our code editor to have
+  // want to change the initial value based on the value the user chose at homepage
   const [theme, setTheme] = useState<any>(githubDark);
   // language
   const [lang, setLang] = useState<any>(python);
 
+  // setting a default theme and language
+  // handle language change
+  // if in upper header changed language then passing that in code editor
+  useEffect(() => {
+    if (currentLanguage === "c++") setLang(cpp);
+    if (currentLanguage === "java") setLang(java);
+    if (currentLanguage === "python") setLang(python);
+    if (currentLanguage === "javascript") setLang(javascript);
+  }, [currentLanguage]);
+
+  // similarly handling theme change
+  useEffect(() => {
+    if (currentTheme === "duotoneLight") setTheme(duotoneLight);
+    if (currentTheme === "duotoneDark") setTheme(duotoneDark);
+    if (currentTheme === "xcodeLight") setTheme(xcodeLight);
+    if (currentTheme === "xcodeDark") setTheme(xcodeDark);
+    if (currentTheme === "okaidia") setTheme(okaidia);
+    if (currentTheme === "githubLight") setTheme(githubLight);
+    if (currentTheme === "githubDark") setTheme(githubDark);
+    if (currentTheme === "darcula") setTheme(darcula);
+    if (currentTheme === "bespin") setTheme(bespin);
+  }, [currentTheme]);
+
   return (
     // according to docs codemirror has theme attribute, apply and changes will be visible, same for language
+    // value is the current code - default code that we want to pass for every language
     <CodeEditorContainer>
       <CodeMirror
         theme={theme}
+        value={currentCode}
         height="100%"
         extensions={[
           lang,

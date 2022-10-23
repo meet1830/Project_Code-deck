@@ -6,6 +6,8 @@ import OutputConsole from "./OutputConsole";
 import { useParams } from "react-router-dom";
 import { PlaygroundContext } from "../../context/PlaygroundContext";
 import styled from 'styled-components';
+import { ModalContext } from "../../context/ModalContext";
+import Modal from "../../components/Modal";
 
 const MainApp = styled.div`
   display: grid;
@@ -25,18 +27,24 @@ const Playground = () => {
 
   // access all playgrounds
   const {folders} = useContext(PlaygroundContext)!;
-  const {title, language} = folders[folderId as string].items[playgroundId as string];
+  const {title, language, code} = folders[folderId as string].items[playgroundId as string];
+  // pass the title and language to editorcontainer to display initial lang and theme as chosen by the user
+
+  // access open field
+  const {isOpen} = useContext(ModalContext)!;
 
   return (
     <div>
       <Navbar />
       <MainApp>
-        <EditorContainer />
+        <EditorContainer title={title} language={language} code={code} folderId={folderId as string} cardId={playgroundId as string} />
         <Consoles>
           <InputConsole />
           <OutputConsole />
         </Consoles>
       </MainApp>
+      {/* to edit the title on playground */}
+      {isOpen?.value === true ? <Modal /> : <></>}
     </div>
   );
 };

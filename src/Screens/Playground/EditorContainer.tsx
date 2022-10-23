@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import CodeEditor from "./CodeEditor";
 import styled from "styled-components";
 import { BiFullscreen } from "react-icons/bi";
@@ -7,6 +7,7 @@ import { BiExport } from "react-icons/bi";
 import { BiEditAlt } from "react-icons/bi";
 import { AiFillPlayCircle } from "react-icons/ai";
 import Select from "react-select";
+import { ModalContext } from "../../context/ModalContext";
 
 const StyledEditorContainer = styled.div`
   display: flex;
@@ -71,7 +72,7 @@ const ButtonGroup = styled.div`
 `;
 
 const RunCode = styled.button`
-  padding: 1rem 2rem;
+  padding: 0.8rem 2rem;
   background: #5cb85c;
   color: white;
   font-weight: 700;
@@ -80,6 +81,15 @@ const RunCode = styled.button`
   svg {
     font-size: 1.4rem;
   }
+`;
+
+const SaveCode = styled.button`
+  padding: 0.4rem 1rem;
+  background: #5cb85c;
+  color: white;
+  font-weight: 700;
+  border-radius: 2rem;
+  border: 0;
 `;
 
 const SelectBars = styled.div`
@@ -95,11 +105,30 @@ const SelectBars = styled.div`
   }
 `;
 
-const EditorContainer = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState(null);
-  const [selectedTheme, setSelectedTheme] = useState(null);
+// creating interface for accepting props from index.tsx
+// now add here that there is code also
+interface EditorContainerProps {
+  title: string;
+  language: string;
+  code: string;
+  
+  // accepting folderid and cardId from index.tsx to edit title
+  folderId: string;
+  cardId: string;
+}
 
-  // value = store of ourselves, labels = shown to the user
+const EditorContainer: React.FC<EditorContainerProps> = ({
+  title,
+  language,
+  code,
+  folderId,
+  cardId
+}) => {
+
+  // import openModal function to edit title
+  const {openModal} = useContext(ModalContext)!;
+
+  // value = store for ourselves, labels = shown to the user
   const languageOptions = [
     { value: "c++", label: "C++" },
     { value: "java", label: "Java" },
@@ -119,6 +148,22 @@ const EditorContainer = () => {
     { value: "darcula", label: "darcula" },
   ];
 
+  // drop down value preselected to the language mentioned by the user at homepage and github dark
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    // loop over all the language options and check which language options has the user selected
+    () => {
+      for (let i = 0; i < languageOptions.length; i++) {
+        if (languageOptions[i].value === language) return languageOptions[i];
+      }
+      // if not matching any language then return 0th language
+      return languageOptions[0];
+    }
+  );
+  const [selectedTheme, setSelectedTheme] = useState({
+    value: "githubDark",
+    label: "githubDark",
+  });
+
   const handleChangeLanguage = (selectedOption: any) => {
     setSelectedLanguage(selectedOption);
   };
@@ -131,12 +176,23 @@ const EditorContainer = () => {
     <StyledEditorContainer>
       <UpperToolbar>
         <Title>
-          <h3>Stack Implementaion</h3>
-          <button>
+          <h3>{title}</h3>
+          <button onClick={() => {
+            // open an edit modal to edit card title
+            openModal({
+              value: true,
+              type: "1",
+              identifier: {
+                folderId: folderId,
+                cardId: cardId,
+              }
+            })
+          }}>
             <BiEditAlt />
           </button>
         </Title>
         <SelectBars>
+          <SaveCode>Save Code</SaveCode>
           <Select
             value={selectedLanguage}
             options={languageOptions}
@@ -150,7 +206,13 @@ const EditorContainer = () => {
         </SelectBars>
       </UpperToolbar>
 
-      <CodeEditor />
+      {/* have to pass language and theme to codeeditor that is selected from header */}
+      {/* now pass the code received from index.tsx to codeeditor */}
+      <CodeEditor
+        currentLanguage={selectedLanguage.value}
+        currentTheme={selectedTheme.value}
+        currentCode={code}
+      />
 
       <LowerToolbar>
         <ButtonGroup>
