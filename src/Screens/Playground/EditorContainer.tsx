@@ -8,6 +8,7 @@ import { BiEditAlt } from "react-icons/bi";
 import { AiFillPlayCircle } from "react-icons/ai";
 import Select from "react-select";
 import { ModalContext } from "../../context/ModalContext";
+import { languageMap } from "../../context/PlaygroundContext";
 
 const StyledEditorContainer = styled.div`
   display: flex;
@@ -49,7 +50,8 @@ const LowerToolbar = styled.div`
   justify-content: space-between;
   padding: 0 2rem;
 
-  button {
+  button,
+  label {
     background: transperant;
     outline: 0;
     border: 0;
@@ -62,6 +64,8 @@ const LowerToolbar = styled.div`
     svg {
       font-size: 1.4rem;
     }
+
+    cursor: pointer;
   }
 `;
 
@@ -109,24 +113,32 @@ const SelectBars = styled.div`
 // now add here that there is code also
 interface EditorContainerProps {
   title: string;
-  language: string;
-  code: string;
-  
+
   // accepting folderid and cardId from index.tsx to edit title
   folderId: string;
   cardId: string;
+
+  currentLanguage: string;
+  currentCode: string;
+  setCurrentLanguage: (newLang: string) => void;
+  setCurrentCode: (newCode: string) => void;
+  saveCode: () => void;
+  runCode: () => void;
 }
 
 const EditorContainer: React.FC<EditorContainerProps> = ({
   title,
-  language,
-  code,
+  currentLanguage,
+  currentCode,
+  setCurrentLanguage,
+  setCurrentCode,
   folderId,
-  cardId
+  cardId,
+  saveCode,
+  runCode,
 }) => {
-
   // import openModal function to edit title
-  const {openModal} = useContext(ModalContext)!;
+  const { openModal } = useContext(ModalContext)!;
 
   // value = store for ourselves, labels = shown to the user
   const languageOptions = [
@@ -153,7 +165,8 @@ const EditorContainer: React.FC<EditorContainerProps> = ({
     // loop over all the language options and check which language options has the user selected
     () => {
       for (let i = 0; i < languageOptions.length; i++) {
-        if (languageOptions[i].value === language) return languageOptions[i];
+        if (languageOptions[i].value === currentLanguage)
+          return languageOptions[i];
       }
       // if not matching any language then return 0th language
       return languageOptions[0];
@@ -166,33 +179,71 @@ const EditorContainer: React.FC<EditorContainerProps> = ({
 
   const handleChangeLanguage = (selectedOption: any) => {
     setSelectedLanguage(selectedOption);
+
+    // saving the language selected in the editor
+    setCurrentLanguage(selectedOption.value);
+
+    // if user decided to change language in editor and there is some code of prev language then we need to erase it
+    setCurrentCode(languageMap[selectedOption.value].defaultCode);
   };
 
   const handleChangeTheme = (selectedOption: any) => {
     setSelectedTheme(selectedOption);
   };
 
+  // functions to reflect code from text file to editor
+  const getFile = (e: any) => {
+    // pass some key to it (argument)
+    const input = e.target;
+
+    // input is an object where we have files which is an array, where it has different files like 'file1', 'file2'. checking if user has selected multiple files
+    if ("files" in input && input.files.length > 0) {
+      // if having multiple files then just pass 0th file
+      placeFileContent(input.files[0]);
+    }
+  };
+
+  const placeFileContent = (file: any) => {
+    // .then means waiting for file to read and when the file has been read after that
+    readFileContent(file).then((content) => { 
+      // console.log(content);
+      setCurrentCode(content as string);
+    }).catch((error) => console.log(error));
+  };
+
+  // filereader function provided by js
+  function readFileContent(file: any) {
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      reader.onload = (event) => resolve(event!.target!.result);
+      reader.onerror = (error) => reject(error);
+      reader.readAsText(file);
+    });
+  }
+
   return (
     <StyledEditorContainer>
       <UpperToolbar>
         <Title>
           <h3>{title}</h3>
-          <button onClick={() => {
-            // open an edit modal to edit card title
-            openModal({
-              value: true,
-              type: "1",
-              identifier: {
-                folderId: folderId,
-                cardId: cardId,
-              }
-            })
-          }}>
+          <button
+            onClick={() => {
+              // open an edit modal to edit card title
+              openModal({
+                value: true,
+                type: "1",
+                identifier: {
+                  folderId: folderId,
+                  cardId: cardId,
+                },
+              });
+            }}
+          >
             <BiEditAlt />
           </button>
         </Title>
         <SelectBars>
-          <SaveCode>Save Code</SaveCode>
+          <SaveCode onClick={() => saveCode()}>Save Code</SaveCode>
           <Select
             value={selectedLanguage}
             options={languageOptions}
@@ -211,7 +262,8 @@ const EditorContainer: React.FC<EditorContainerProps> = ({
       <CodeEditor
         currentLanguage={selectedLanguage.value}
         currentTheme={selectedTheme.value}
-        currentCode={code}
+        currentCode={currentCode}
+        setCurrentCode={setCurrentCode}
       />
 
       <LowerToolbar>
@@ -219,14 +271,16 @@ const EditorContainer: React.FC<EditorContainerProps> = ({
           <button>
             <BiFullscreen /> Full Screen
           </button>
-          <button>
+          {/* for file selector first set the button to label */}
+          <label>
+            <input type="file" accept=".txt" style={{ display: "none" }} onChange={(e) => getFile(e)} />
             <BiImport /> Import Code
-          </button>
+          </label>
           <button>
             <BiExport /> Export Code
           </button>
         </ButtonGroup>
-        <RunCode>
+        <RunCode onClick={() => runCode()}>
           <AiFillPlayCircle /> Run Code
         </RunCode>
       </LowerToolbar>

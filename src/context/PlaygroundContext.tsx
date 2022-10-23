@@ -5,7 +5,7 @@ interface PlaygroundContextType {
   folders: any;
   setFolders: any;
 
-  // want these functions to get accessed from the whole project
+  // want these functions to get accessed in the whole project
   createNewFolder: (folderTitle: string) => void;
   createNewPlayground: (
     folderId: string,
@@ -25,6 +25,13 @@ interface PlaygroundContextType {
   editFolderTitle: (folderId: string, newFolderTitle: string) => void;
   deleteCard: (folderId: string, cardId: string) => void;
   deleteFolder: (folderId: string) => void;
+
+  savePlayground: (
+    folderId: string,
+    cardId: string,
+    newCode: string,
+    newLanguage: string
+  ) => void;
 }
 
 export const PlaygroundContext = createContext<PlaygroundContextType | null>(
@@ -45,12 +52,14 @@ export interface FolderType {
   [key: string]: FolderT;
 }
 
-const languageMap: {
+export const languageMap: {
   [key: string]: {
+    id: number;
     defaultCode: string;
-  }
+  };
 } = {
   "c++": {
+    id: 54,
     defaultCode:
       "#include<iostream>" +
       "\n" +
@@ -59,17 +68,18 @@ const languageMap: {
       "      return 0; \n" +
       "}",
   },
-  "python": {
-    defaultCode: 
-      "# your code here",
+  python: {
+    id: 71,
+    defaultCode: "# your code here",
   },
-  "javascript": {
-    defaultCode: 
-      "// your code here",
+  javascript: {
+    id: 63,
+    defaultCode: "// your code here",
   },
-  "java": {
+  java: {
+    id: 62,
     defaultCode: `import java.util.*;\nimport java.lang.*;\nimport java.io.*;\n\npublic class Main\n{\n\tpublic static void main (String[] args) throws java.lang.Exception\n\t{\n\t\t//your code here\n\t}\n}`,
-  }
+  },
 };
 
 // saving to local storage
@@ -225,6 +235,21 @@ export default function PlaygroundProvider({ children }: { children: any }) {
     });
   };
 
+  // saving new code and new language in local storage
+  const savePlayground = (
+    folderId: string,
+    cardId: string,
+    newCode: string,
+    newLanguage: string
+  ) => {
+    setFolders((oldState: any) => {
+      const newState = { ...oldState };
+      newState[folderId].items[cardId].code = newCode;
+      newState[folderId].items[cardId].language = newLanguage;
+      return newState;
+    });
+  };
+
   const makeAvailableGlobally: PlaygroundContextType = {
     folders: folders,
     setFolders: setFolders,
@@ -236,6 +261,8 @@ export default function PlaygroundProvider({ children }: { children: any }) {
     editFolderTitle: editFolderTitle,
     deleteCard: deleteCard,
     deleteFolder: deleteFolder,
+
+    savePlayground: savePlayground,
   };
 
   return (

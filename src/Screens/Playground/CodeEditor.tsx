@@ -36,6 +36,7 @@ interface CodeEditorProps {
   currentLanguage: string;
   currentTheme: string;
   currentCode: string;
+  setCurrentCode: (newCode: string) => void
 }
 
 // codeeditor is a functional component(not a class component). and to pass the interface as type we have to write it. accept the props as arguments
@@ -43,6 +44,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   currentLanguage,
   currentTheme,
   currentCode,
+  setCurrentCode,
 }) => {
   // code editor configuration
   // the theme that we want our code editor to have
@@ -81,6 +83,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       <CodeMirror
         theme={theme}
         value={currentCode}
+        // different onchange for codemirror, hover to see argument syntax
+        onChange={(value: string) => {
+          setCurrentCode(value);
+        }}
         height="100%"
         extensions={[
           lang,

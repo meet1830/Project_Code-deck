@@ -8,6 +8,7 @@ import EditFolderTitle from "./modalTypes/EditFolderTitle";
 import NewCard from "./modalTypes/NewCard";
 import NewFolder from "./modalTypes/NewFolder";
 import NewFolderAndPlayground from "./modalTypes/NewFolderAndPlayground";
+import Loading from "./modalTypes/Loading";
 
 export const ModalContainer = styled.div`
   background: rgba(0, 0, 0, 0.4);
@@ -87,6 +88,7 @@ const Modal = () => {
   // 3 => newCard
   // 4 => newFolder
   // 5 => newFolderAndPlayground -> from left pane
+  // 6 => loading
 
   return (
     <ModalContainer>
@@ -111,6 +113,9 @@ const Modal = () => {
         )}
         {isOpen.type === "5" && (
           <NewFolderAndPlayground closeModal={closeModal} identifier={isOpen.identifier} />
+        )}
+        {isOpen.type === "6" && (
+          <Loading />
         )}
       </ModalContent>
     </ModalContainer>
