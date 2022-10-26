@@ -22,8 +22,7 @@ import { indentUnit } from "@codemirror/language"; /* no of spaces for indentati
 import { EditorState } from "@codemirror/state"; /* no of spaces after pressing tab */
 
 const CodeEditorContainer = styled.div`
-  height: calc(100vh - 12.5rem);
-  // 4 rem each for lower and upper toolbar 4.5 for navbar
+  height: 100%;
 
   // styling just next div after this
   & > div {

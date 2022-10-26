@@ -101,7 +101,6 @@ const Playground = () => {
 
     // call the api using axios
     const res = await axios.request(options);
-    console.log(res);
     return res.data.token;
   };
 

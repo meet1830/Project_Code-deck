@@ -29,6 +29,10 @@ const MainHeading = styled.h1`
   font-weight: 400;
   color: white;
   margin-bottom: 0.75rem;
+
+  span {
+    font-weight: 700;
+  }
 `;
 
 const SubHeading = styled.h2`
@@ -64,7 +68,7 @@ const LeftPane = () => {
       <ContentContainer>
         <Logo src="/logo.png" alt="Logo" />
         <MainHeading>
-          <span>Code</span>Deck
+          <span>Code </span>Deck
         </MainHeading>
         <SubHeading>Code. Compile. Debug.</SubHeading>
         <AddNewButton onClick={() => {

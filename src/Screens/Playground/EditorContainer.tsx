@@ -3,12 +3,14 @@ import CodeEditor from "./CodeEditor";
 import styled from "styled-components";
 import { BiFullscreen } from "react-icons/bi";
 import { BiImport } from "react-icons/bi";
-import { BiExport } from "react-icons/bi";
 import { BiEditAlt } from "react-icons/bi";
 import { AiFillPlayCircle } from "react-icons/ai";
 import Select from "react-select";
 import { ModalContext } from "../../context/ModalContext";
 import { languageMap } from "../../context/PlaygroundContext";
+import ExportCode from "./ExportCode";
+
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 const StyledEditorContainer = styled.div`
   display: flex;
@@ -109,6 +111,17 @@ const SelectBars = styled.div`
   }
 `;
 
+const EditorSpace = styled.div`
+  &>div: nth-of-type(1) {
+    height: calc(100vh - 12.5rem);
+    // 4 rem each for lower and upper toolbar 4.5 for navbar
+
+    [class="fullscreen-enabled"] {
+      height: 100vh;
+    }
+  }
+`;
+
 // creating interface for accepting props from index.tsx
 // now add here that there is code also
 interface EditorContainerProps {
@@ -205,10 +218,12 @@ const EditorContainer: React.FC<EditorContainerProps> = ({
 
   const placeFileContent = (file: any) => {
     // .then means waiting for file to read and when the file has been read after that
-    readFileContent(file).then((content) => { 
-      // console.log(content);
-      setCurrentCode(content as string);
-    }).catch((error) => console.log(error));
+    readFileContent(file)
+      .then((content) => {
+        // console.log(content);
+        setCurrentCode(content as string);
+      })
+      .catch((error) => console.log(error));
   };
 
   // filereader function provided by js
@@ -220,6 +235,9 @@ const EditorContainer: React.FC<EditorContainerProps> = ({
       reader.readAsText(file);
     });
   }
+
+  // set full screen
+  const handle = useFullScreenHandle();
 
   return (
     <StyledEditorContainer>
@@ -259,28 +277,40 @@ const EditorContainer: React.FC<EditorContainerProps> = ({
 
       {/* have to pass language and theme to codeeditor that is selected from header */}
       {/* now pass the code received from index.tsx to codeeditor */}
-      <CodeEditor
-        currentLanguage={selectedLanguage.value}
-        currentTheme={selectedTheme.value}
-        currentCode={currentCode}
-        setCurrentCode={setCurrentCode}
-      />
+      <EditorSpace>
+        <FullScreen handle={handle}>
+          <CodeEditor
+            currentLanguage={selectedLanguage.value}
+            currentTheme={selectedTheme.value}
+            currentCode={currentCode}
+            setCurrentCode={setCurrentCode}
+          />
+        </FullScreen>
+      </EditorSpace>
 
       <LowerToolbar>
         <ButtonGroup>
-          <button>
+          <button onClick={handle.enter} >
             <BiFullscreen /> Full Screen
           </button>
           {/* for file selector first set the button to label */}
           <label>
-            <input type="file" accept=".txt" style={{ display: "none" }} onChange={(e) => getFile(e)} />
+            <input
+              type="file"
+              accept=".txt"
+              style={{ display: "none" }}
+              onChange={(e) => getFile(e)}
+            />
             <BiImport /> Import Code
           </label>
-          <button>
-            <BiExport /> Export Code
-          </button>
+          <ExportCode exportString={currentCode} />
         </ButtonGroup>
-        <RunCode onClick={() => runCode()}>
+        <RunCode
+          onClick={() => {
+            runCode();
+            saveCode();
+          }}
+        >
           <AiFillPlayCircle /> Run Code
         </RunCode>
       </LowerToolbar>

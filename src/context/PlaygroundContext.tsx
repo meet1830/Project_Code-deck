@@ -91,8 +91,8 @@ const initialItems = {
     title: "Folder Title 1",
     items: {
       [uuid()]: {
-        title: "Stack Implementation",
-        language: "Cpp",
+        title: "Playground Title 1",
+        language: "C++",
         code: languageMap["c++"].defaultCode,
       },
     },

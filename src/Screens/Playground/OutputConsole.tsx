@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { BiExport } from "react-icons/bi";
+import ExportCode from "./ExportCode";
 
 const Console = styled.div`
   background: white;
@@ -45,6 +45,7 @@ const OutputArea = styled.textarea`
   padding-top: 0.5rem;
   font-size: 1.1rem;
   font-style: italic;
+  resize: none;
 `;
 
 interface OutputConsoleProps {
@@ -56,10 +57,7 @@ const OutputConsole: React.FC<OutputConsoleProps> = ({currentOutput}) => {
     <Console>
       <Header>
         Output:
-        <button>
-          <BiExport />
-          Export Output
-        </button>
+        <ExportCode exportString={currentOutput} />
       </Header>
       <OutputArea value={currentOutput} disabled ></OutputArea>
     </Console>
