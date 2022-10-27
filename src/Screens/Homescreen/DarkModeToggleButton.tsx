@@ -2,6 +2,11 @@ import React from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { DarkModeContext } from "../../DarkModeContext/DarkModeContext";
 
+import { DarkTheme, LightTheme } from "../../DarkModeContext/DarkModes";
+
+import MoonIcon from "../../styles/icons/MoonIcon";
+import SunIcon from "../../styles/icons/SunIcon";
+
 interface DarModeButtonProps {
   changeTheme: () => void;
 }
@@ -25,6 +30,7 @@ const ToggleButton = styled.input`
   border-radius: 50px;
   position: relative;
   transition: 0.4s;
+  margin: 0 0.5rem;
 
   &:before {
     content: "";
@@ -58,18 +64,23 @@ function DarkModeToggleButton<DarModeButtonProps>({
 
   function handleChange() {
     changeTheme();
+    SetIsDarkThemeOn(!isDarkThemeOn);
   }
   return (
-    <ButtonContainer>
-      <h5 style={{ marginRight: "10px", color: "white" }}>Light</h5>
-      <ToggleButton
-        type="checkbox"
-        className="toggle-button"
-        onChange={handleChange}
-        checked={isDarkThemeOn}
-      />
-      <h5 style={{ marginLeft: "10px", color: "white" }}>Dark</h5>
-    </ButtonContainer>
+    <ThemeProvider theme={isDarkThemeOn ? DarkTheme : LightTheme}>
+      <ButtonContainer>
+        {/* <h5 style={{ marginRight: "10px", color: "white" }}>Light</h5> */}
+        <MoonIcon />
+        <ToggleButton
+          type="checkbox"
+          className="toggle-button"
+          onChange={handleChange}
+          checked={isDarkThemeOn}
+        />
+        {/* <h5 style={{ marginLeft: "10px", color: "white" }}>Dark</h5> */}
+        <SunIcon />
+      </ButtonContainer>
+    </ThemeProvider>
   );
 }
 

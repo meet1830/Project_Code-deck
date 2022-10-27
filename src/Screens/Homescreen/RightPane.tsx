@@ -22,7 +22,7 @@ const StyledRightPane = styled.div`
   padding: 2rem;
   height: 100vh;
   // background: #fafafa;
-  background: ${(props) => props.theme.body}
+  background: ${(props) => props.theme.body};
   position: absolute;
   right: 0;
   top: 0;
@@ -117,7 +117,7 @@ const SmallLogo = styled.img`
 
 const CardContent = styled.div`
   flex-grow: 1;
-  margin-left: -20px;
+  margin-left: -10px;
   color: "black";
 
   h5 {
