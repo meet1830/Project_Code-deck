@@ -11,7 +11,9 @@ const HomeScreenContainer = styled.div`
   // not using grid bc when scroll the black portion also gets scrolled
 
   position: relative;
-  width: 100;
+  display: flex;
+  justify-content: flex-end;
+  width: 100vw;
   height: 100vh;
 `;
 

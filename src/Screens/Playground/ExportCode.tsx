@@ -2,13 +2,18 @@ import React, { useEffect, useState } from "react";
 import { BiExport } from "react-icons/bi";
 import styled from "styled-components";
 
+import { DarkModeContext } from "../../DarkModeContext/DarkModeContext";
+import { ThemeProvider } from "styled-components";
+import { DarkTheme, LightTheme } from "../../DarkModeContext/DarkModes";
+
 interface Export {
   exportString: string;
 }
 
 const ExportCode = styled.button`
   a {
-    color: black;
+    background: ${(props) => props.theme.body};
+    color: ${(props) => props.theme.mainHeading};
     text-decoration: none;
     background: transperant;
     outline: 0;
@@ -50,6 +55,15 @@ export const SaveList: React.FC<Export> = ({ exportString }) => {
   useEffect(() => {
     makeTextFile();
   }, [exportString]);
+
+  const darkTheme = React.useContext(DarkModeContext)!;
+  let isDarkThemeOn = darkTheme.isDarkModeOn;
+  let SetIsDarkThemeOn = darkTheme.setIsDarkModeOn;
+
+  function changeTheme() {
+    SetIsDarkThemeOn(!isDarkThemeOn);
+    console.log("Clicked");
+  }
 
   return (
     <ExportCode>

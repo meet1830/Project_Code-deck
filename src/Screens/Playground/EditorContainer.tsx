@@ -12,13 +12,19 @@ import ExportCode from "./ExportCode";
 
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
+import { DarkModeContext } from "../../DarkModeContext/DarkModeContext";
+import { ThemeProvider } from "styled-components";
+import { DarkTheme, LightTheme } from "../../DarkModeContext/DarkModes";
+
 const StyledEditorContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
 const UpperToolbar = styled.div`
-  background: white;
+  // background: white;
+  background: ${(props) => props.theme.body};
+  color: ${(props) => props.theme.mainHeading};
   height: 4rem;
 
   display: flex;
@@ -37,6 +43,7 @@ const Title = styled.div`
   }
 
   button {
+    color: ${(props) => props.theme.mainHeading};
     background: transparent;
     font-size: 1.3rem;
     border: 0;
@@ -45,7 +52,9 @@ const Title = styled.div`
 `;
 
 const LowerToolbar = styled.div`
-  background: white;
+  // background: white;
+  background: ${(props) => props.theme.body};
+  color: ${(props) => props.theme.mainHeading};
   height: 4rem;
   display: flex;
   align-items: center;
@@ -54,6 +63,7 @@ const LowerToolbar = styled.div`
 
   button,
   label {
+    color: ${(props) => props.theme.mainHeading};
     background: transperant;
     outline: 0;
     border: 0;
@@ -80,7 +90,7 @@ const ButtonGroup = styled.div`
 const RunCode = styled.button`
   padding: 0.8rem 2rem;
   background: #5cb85c;
-  color: white;
+  color: ${(props) => props.theme.mainHeading};
   font-weight: 700;
   border-radius: 2rem;
 
@@ -90,9 +100,10 @@ const RunCode = styled.button`
 `;
 
 const SaveCode = styled.button`
+  color: ${(props) => props.theme.mainHeading};
   padding: 0.4rem 1rem;
   background: #5cb85c;
-  color: white;
+  // color: white;
   font-weight: 700;
   border-radius: 2rem;
   border: 0;
@@ -239,82 +250,94 @@ const EditorContainer: React.FC<EditorContainerProps> = ({
   // set full screen
   const handle = useFullScreenHandle();
 
+  // DarkTheme Functionality
+  const darkTheme = React.useContext(DarkModeContext)!;
+  let isDarkThemeOn = darkTheme.isDarkModeOn;
+  let SetIsDarkThemeOn = darkTheme.setIsDarkModeOn;
+
+  function changeTheme() {
+    SetIsDarkThemeOn(!isDarkThemeOn);
+    console.log("Clicked");
+  }
+
   return (
-    <StyledEditorContainer>
-      <UpperToolbar>
-        <Title>
-          <h3>{title}</h3>
-          <button
+    <ThemeProvider theme={isDarkThemeOn ? DarkTheme : LightTheme}>
+      <StyledEditorContainer>
+        <UpperToolbar>
+          <Title>
+            <h3>{title}</h3>
+            <button
+              onClick={() => {
+                // open an edit modal to edit card title
+                openModal({
+                  value: true,
+                  type: "1",
+                  identifier: {
+                    folderId: folderId,
+                    cardId: cardId,
+                  },
+                });
+              }}
+            >
+              <BiEditAlt />
+            </button>
+          </Title>
+          <SelectBars>
+            <SaveCode onClick={() => saveCode()}>Save Code</SaveCode>
+            <Select
+              value={selectedLanguage}
+              options={languageOptions}
+              onChange={handleChangeLanguage}
+            />
+            <Select
+              value={selectedTheme}
+              options={themeOptions}
+              onChange={handleChangeTheme}
+            />
+          </SelectBars>
+        </UpperToolbar>
+
+        {/* have to pass language and theme to codeeditor that is selected from header */}
+        {/* now pass the code received from index.tsx to codeeditor */}
+        <EditorSpace>
+          <FullScreen handle={handle}>
+            <CodeEditor
+              currentLanguage={selectedLanguage.value}
+              currentTheme={selectedTheme.value}
+              currentCode={currentCode}
+              setCurrentCode={setCurrentCode}
+            />
+          </FullScreen>
+        </EditorSpace>
+
+        <LowerToolbar>
+          <ButtonGroup>
+            <label onClick={handle.enter}>
+              <BiFullscreen /> Full Screen
+            </label>
+            {/* for file selector first set the button to label */}
+            <label>
+              <input
+                type="file"
+                accept=".txt"
+                style={{ display: "none" }}
+                onChange={(e) => getFile(e)}
+              />
+              <BiImport /> Import Code
+            </label>
+            <ExportCode exportString={currentCode} />
+          </ButtonGroup>
+          <RunCode
             onClick={() => {
-              // open an edit modal to edit card title
-              openModal({
-                value: true,
-                type: "1",
-                identifier: {
-                  folderId: folderId,
-                  cardId: cardId,
-                },
-              });
+              runCode();
+              saveCode();
             }}
           >
-            <BiEditAlt />
-          </button>
-        </Title>
-        <SelectBars>
-          <SaveCode onClick={() => saveCode()}>Save Code</SaveCode>
-          <Select
-            value={selectedLanguage}
-            options={languageOptions}
-            onChange={handleChangeLanguage}
-          />
-          <Select
-            value={selectedTheme}
-            options={themeOptions}
-            onChange={handleChangeTheme}
-          />
-        </SelectBars>
-      </UpperToolbar>
-
-      {/* have to pass language and theme to codeeditor that is selected from header */}
-      {/* now pass the code received from index.tsx to codeeditor */}
-      <EditorSpace>
-        <FullScreen handle={handle}>
-          <CodeEditor
-            currentLanguage={selectedLanguage.value}
-            currentTheme={selectedTheme.value}
-            currentCode={currentCode}
-            setCurrentCode={setCurrentCode}
-          />
-        </FullScreen>
-      </EditorSpace>
-
-      <LowerToolbar>
-        <ButtonGroup>
-          <button onClick={handle.enter} >
-            <BiFullscreen /> Full Screen
-          </button>
-          {/* for file selector first set the button to label */}
-          <label>
-            <input
-              type="file"
-              accept=".txt"
-              style={{ display: "none" }}
-              onChange={(e) => getFile(e)}
-            />
-            <BiImport /> Import Code
-          </label>
-          <ExportCode exportString={currentCode} />
-        </ButtonGroup>
-        <RunCode
-          onClick={() => {
-            runCode();
-            saveCode();
-          }}
-        >
-          <AiFillPlayCircle /> Run Code
-        </RunCode>
-      </LowerToolbar>
-    </StyledEditorContainer>
+            <AiFillPlayCircle /> Run Code
+          </RunCode>
+        </LowerToolbar>
+      </StyledEditorContainer>
+    </ThemeProvider>
   );
 };
 

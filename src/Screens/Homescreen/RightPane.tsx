@@ -1,10 +1,14 @@
 import React, { useContext } from "react";
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { IoTrashOutline } from "react-icons/io5";
 import { BiEditAlt } from "react-icons/bi";
 import { ModalContext } from "../../context/ModalContext";
 import { PlaygroundContext } from "../../context/PlaygroundContext";
 import { useNavigate } from "react-router-dom";
+
+import { DarkModeContext } from "../../DarkModeContext/DarkModeContext";
+import { DarkTheme, LightTheme } from "../../DarkModeContext/DarkModes";
+import DarkModeToggleButton from "./DarkModeToggleButton";
 
 interface HeaderProps {
   readonly variant: string;
@@ -16,14 +20,18 @@ interface HeadingProps {
 
 const StyledRightPane = styled.div`
   padding: 2rem;
-  background: #fafafa;
+  height: 100vh;
+  // background: #fafafa;
+  background: ${(props) => props.theme.body}
   position: absolute;
   right: 0;
   top: 0;
   width: 60%;
+  color: ${(props) => props.theme.mainHeading};
 `;
 
 const Header = styled.div<HeaderProps>`
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -43,6 +51,7 @@ const Header = styled.div<HeaderProps>`
 `;
 
 const Heading = styled.h3<HeadingProps>`
+  margin-top: 20px;
   font-weight: 400;
   font-size: ${(props) => (props.size === "large" ? "1.8rem" : "1.5rem")};
 
@@ -52,6 +61,7 @@ const Heading = styled.h3<HeadingProps>`
 `;
 
 const AddButton = styled.button`
+  margin-top: 20px;
   display: flex;
   gap: 0.5rem;
   align-items: center;
@@ -70,6 +80,8 @@ const AddButton = styled.button`
   &:hover {
     opacity: 0.75;
   }
+
+  color: ${(props) => props.theme.mainHeading};
 `;
 
 const Folder = styled.div`
@@ -88,14 +100,14 @@ const PlaygroundCard = styled.div`
   align-items: center;
   padding: 0.6rem;
   gap: 1rem;
-  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
+  // box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: ${(props) => props.theme.shadow};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.1s ease;
 
   &:hover {
     opacity: 0.75;
-
   }
 `;
 
@@ -105,6 +117,8 @@ const SmallLogo = styled.img`
 
 const CardContent = styled.div`
   flex-grow: 1;
+  margin-left: -20px;
+  color: "black";
 
   h5 {
     font-weight: 400;
@@ -114,6 +128,8 @@ const CardContent = styled.div`
 `;
 
 const Icons = styled.div`
+  margin-top: 20px;
+  align-items: center;
   display: flex;
   gap: 0.5rem;
   font-size: 1.25rem;
@@ -123,6 +139,7 @@ const Icons = styled.div`
 const FolderButtons = styled.div`
   display: flex;
   align-items: center;
+  justify-content: flex-end;
 `;
 
 const RightPane = () => {
@@ -137,119 +154,135 @@ const RightPane = () => {
   // initialize navigate
   const navigate = useNavigate();
 
-  return (
-    <StyledRightPane>
-      <Header variant="main">
-        <Heading size="large">
-          My <span>Playgrounds</span>
-        </Heading>
-        <AddButton
-          onClick={() => {
-            openModal({
-              value: true,
-              type: "4",
-              identifier: {
-                folderId: "",
-                cardId: "",
-              },
-            });
-          }}
-        >
-          <span>+</span> New Folder
-        </AddButton>
-      </Header>
+  // dark mode
+  const darkTheme = useContext(DarkModeContext)!;
+  let isDarkThemeOn = darkTheme.isDarkModeOn;
+  let SetIsDarkThemeOn = darkTheme.setIsDarkModeOn;
 
-      {/* dynamically generating folders */}
-      {Object.entries(Folders).map(
-        ([folderId, folder]: [folderId: string, folder: any]) => (
-          <Folder>
-            <Header variant="folder">
-              <Heading size="small">{folder.title}</Heading>
-              <FolderButtons>
-                <Icons>
-                  <IoTrashOutline
-                    onClick={() => {
-                      // delete folder
-                      deleteFolder(folderId);
-                    }}
-                  />
-                  <BiEditAlt
+  function changeTheme() {
+    SetIsDarkThemeOn(!isDarkThemeOn);
+    console.log("Clicked");
+  }
+
+  return (
+    <ThemeProvider theme={isDarkThemeOn ? DarkTheme : LightTheme}>
+      <StyledRightPane>
+        <Header variant="main">
+          <Heading size="large">
+            My <span>Playgrounds</span>
+          </Heading>
+          <AddButton
+            onClick={() => {
+              openModal({
+                value: true,
+                type: "4",
+                identifier: {
+                  folderId: "",
+                  cardId: "",
+                },
+              });
+            }}
+          >
+            <span>+</span> New Folder
+          </AddButton>
+        </Header>
+
+        <DarkModeToggleButton changeTheme={changeTheme} />
+
+        {/* dynamically generating folders */}
+        {Object.entries(Folders).map(
+          ([folderId, folder]: [folderId: string, folder: any]) => (
+            <Folder>
+              <Header variant="folder">
+                <Heading size="small">{folder.title}</Heading>
+                <FolderButtons>
+                  <Icons>
+                    <IoTrashOutline
+                      onClick={() => {
+                        // delete folder
+                        deleteFolder(folderId);
+                      }}
+                    />
+                    <BiEditAlt
+                      onClick={() => {
+                        openModal({
+                          value: true,
+                          type: "2",
+                          identifier: {
+                            folderId: folderId,
+                            cardId: "",
+                          },
+                        });
+                      }}
+                    />
+                  </Icons>
+                  <AddButton
                     onClick={() => {
                       openModal({
                         value: true,
-                        type: "2",
+                        type: "3",
                         identifier: {
                           folderId: folderId,
                           cardId: "",
                         },
                       });
                     }}
-                  />
-                </Icons>
-                <AddButton
-                  onClick={() => {
-                    openModal({
-                      value: true,
-                      type: "3",
-                      identifier: {
-                        folderId: folderId,
-                        cardId: "",
-                      },
-                    });
-                  }}
-                >
-                  <span>+</span> New Playground
-                </AddButton>
-              </FolderButtons>
-            </Header>
-
-            <CardContainer>
-              {/* dynamically generating items inside folders */}
-              {Object.entries(folder.items).map(
-                ([cardId, card]: [cardId: string, card: any]) => (
-                  <PlaygroundCard
-                    onClick={() => {
-                      // navigate to playground page
-                      navigate(`/code/${folderId}/${cardId}`);
-                    }}
                   >
-                    <SmallLogo src="/logo-small.png" alt="" />
-                    <CardContent>
-                      <h5>{card.title}</h5>
-                      <p>Language: {card.language}</p>
-                    </CardContent>
-                    <Icons onClick={(e) => {
-                      // to stop click propogation from child to parent
-                      // if click on edit then also redirects to new playground page which we dont want
-                      e.stopPropagation();
-                    }}>
-                      <IoTrashOutline
-                        onClick={() => {
-                          // delete card
-                          deleteCard(folderId, cardId);
+                    <span>+</span> New Playground
+                  </AddButton>
+                </FolderButtons>
+              </Header>
+
+              <CardContainer>
+                {/* dynamically generating items inside folders */}
+                {Object.entries(folder.items).map(
+                  ([cardId, card]: [cardId: string, card: any]) => (
+                    <PlaygroundCard
+                      onClick={() => {
+                        // navigate to playground page
+                        navigate(`/code/${folderId}/${cardId}`);
+                      }}
+                    >
+                      <SmallLogo src="/logo-small.png" alt="" />
+                      <CardContent>
+                        <h5>{card.title}</h5>
+                        <p>Language: {card.language}</p>
+                      </CardContent>
+                      <Icons
+                        onClick={(e) => {
+                          // to stop click propogation from child to parent
+                          // if click on edit then also redirects to new playground page which we dont want
+                          e.stopPropagation();
                         }}
-                      />
-                      <BiEditAlt
-                        onClick={() => {
-                          openModal({
-                            value: true,
-                            type: "1",
-                            identifier: {
-                              folderId: folderId,
-                              cardId: cardId,
-                            },
-                          });
-                        }}
-                      />
-                    </Icons>
-                  </PlaygroundCard>
-                )
-              )}
-            </CardContainer>
-          </Folder>
-        )
-      )}
-    </StyledRightPane>
+                      >
+                        <IoTrashOutline
+                          onClick={() => {
+                            // delete card
+                            deleteCard(folderId, cardId);
+                          }}
+                        />
+                        <BiEditAlt
+                          onClick={() => {
+                            openModal({
+                              value: true,
+                              type: "1",
+                              identifier: {
+                                folderId: folderId,
+                                cardId: cardId,
+                              },
+                            });
+                          }}
+                        />
+                      </Icons>
+                    </PlaygroundCard>
+                  )
+                )}
+              </CardContainer>
+            </Folder>
+          )
+        )}
+      </StyledRightPane>
+    </ThemeProvider>
   );
 };
 
